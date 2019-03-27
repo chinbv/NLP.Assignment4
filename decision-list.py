@@ -76,6 +76,16 @@
 ##############################################################################################################################################################################################################################################################################
 ##############################################################################################################################################################################################################################################################################
 
+## with training you order the features by most distinguishing
+## then run through array against the test data
+## but the training data needs to be scored as well
+##
+##
+##
+##
+##
+
+
 
 import re
 import sys
@@ -83,7 +93,6 @@ from decimal import Decimal
 from random import *
 import operator
 
-wordDict = {}
 
 def main():##main method
 
@@ -100,269 +109,126 @@ def main():##main method
     # testData = sys.argv[2]
     numberOfArgs -= 1 # adjust
     argsIndex = 1
+    aboutToCollectContents = False
+    senseIdTag = None
+    # senseId = None
+    totalCount = 0
+    trainedSenseId = None
 
     while argsIndex <= numberOfArgs:
         loadFileName = sys.argv[argsIndex]
-        # print "opening file " + loadFileName
         f = open(loadFileName,"r")
-        contents = f.read()
+        contents = f.readlines()
         f.close()
-        # print contents + "\n"
         if argsIndex == 1:
-            # print "I got here [1]"
-            generate_tokens(contents)
+            for line in contents:
+                if aboutToCollectContents == True:
+                    # print ("line is: " + str(line))
+                    if generate_tokens(line) == "phone":
+                        senseIdTag = "phone"
+                    else:
+                        senseIdTag = "product"
+                    print ("senseid=" + str(senseIdTag))
+                    aboutToCollectContents = False
+                    # print ("contextLine: " + str(contextLine))
+                    # if contextLine != "</context>":
+                    # print ("contextLine: " + str(contextLine))
+                    # newSenseId = feature1(contextLine)
+                    # print ("newSenseId: " + str(newSenseId))
+                if "<answer" in line:
+                    answerLine = line
+                    totalCount += 1
+
+                    phonePattern = re.compile(r'\bphone\b')
+                    phoneMatch = phonePattern.match(''.join(answerLine))
+                    # print "cardinalMatch " + str(cardinalMatch)
+                    phoneToken = None
+                    if phoneMatch != None:
+                        phoneToken = phoneMatch.group()
+
+                    print ("phoneToken: " + str(phoneToken))
+
+                    print ("answerLine: " + answerLine)
+                if "<context>" in line:
+                    aboutToCollectContents = True
+                # if "</context>" in line:
+                #     aboutToCollectContents = False
+            for l in range(len(frequencyArray)):
+                # print ("length is " + str(len(frequencyArray)))
+                # beautify = frequencyArray.join(frequencyArray[l])
+                # print ("[" + frequencyArray[l] + "]")
+
+                # print (frequencyArray[l], end=" ")
+                print(str(frequencyArray[l]) + " ", end='')
+
+                # print ("frequencyArray " + str(frequencyArray[l]) + ",")
+
+            print ("TotalCount= " + str(totalCount))
         if argsIndex == 2:
-            # print "I got here [2]"
-            generate_testTokens(contents)
-        # print "argsIndex: " + argsIndex
+            print ("\n I got here [2]")
         argsIndex += 1
 
-    # loadFileName = trainingData
-    # print "opening file " + loadFileName
-    # f = open(loadFileName,"r")
-    # contents = f.read()
-    # f.close()
-    # # print contents + "\n"
-    # generate_tokens(contents)
 
-    # loadFileName = testData
-    # print "opening file " + loadFileName
-    # f = open(loadFileName,"r")
-    # contents = f.read()
-    # f.close()
-    # print contents + "\n"
-    # generate_testTokens(contents)
+def feature1(contextLine):
+    senseId = None
+    if "phone" in contextLine:
+        senseId = "phone"
+    # else:
+    #     print ("Does not contain phone")
 
-    # print (generate_sentences(ngramDict))
+    return senseId
 
+def feature2(contextLine):
+    senseId = None
+    if "call" in contextLine:
+        senseId = "phone"
+    # else:
+    #     print ("Does not contain call")
 
+    return senseId
 
-    # counts = dict()
+def feature3(contextLine):
+    senseId = None
+    if "telephone" in contextLine:
+        senseId = "phone"
+    # else:
+    #     print ("Does not contain telephone")
+
+    return senseId
+
+def feature4(contextLine):
+    senseId = None
+    if "tele" in contextLine:
+        senseId = "phone"
+    # else:
+    #     print ("Does not contain tele")
+
+    return senseId
+
+def feature5(contextLine):
+    senseId = None
+    if "number" in contextLine:
+        senseId = "phone"
+    # else:
+    #     print ("Does not contain number")
+
+    return senseId
+
+arrayOfFunctions = [feature1, feature2, feature3, feature4, feature5]
+
+freq1 = 0
+freq2 = 0
+freq3 = 0
+freq4 = 0
+freq5 = 0
+
+frequencyArray = [freq1,freq2,freq3,freq4,freq5]
 
 #Dealing with the test file tokens
-def generate_testTokens(s):
-
-    # Replace new lines with spaces
-    s = re.sub(r'\s+', ' ', s)
-
-    # Break sentence into the tokens, remove empty tokens
-    tokens = [token for token in s.split(" ") if token != ""]
-
-    for i in range(len(tokens)):
-        #print "Tokens {}: {}".format(i+1, tokens[i])
-        currToken = tokens[i]
-
-        punct = ['!',',','.','?']
-
-        # print "CurrToken: " + currToken + "\n"
-
-        # wordDictCheck = wordDict.get(currToken, None)
-
-        # print "wordDictCheck: " + str(wordDictCheck)
-
-        # if wordDictCheck == "None":
-        #     print "Did not exist in wordDict"
-        #     generate_frequencies(currToken, "NN", wordDict)
-        #     print "should have inserted it"
-
-
-        capitalPattern = re.compile(r'[A-Z]\S+')
-        capitalMatch = capitalPattern.match(''.join(currToken))
-        capitalToken = None
-        if capitalMatch != None:
-            capitalToken = capitalMatch.group()
-            # print "capitalToken is " + str(capitalToken)
-
-        cardinalPattern = re.compile(r'[0-9].+')
-        cardinalMatch = cardinalPattern.match(''.join(currToken))
-        # print "cardinalMatch " + str(cardinalMatch)
-        cardinalToken = None
-        if cardinalMatch != None:
-            cardinalToken = cardinalMatch.group()
-
-            # print "cardinalGroup " + str(cardinalGroup)
-
-        specificEndingPattern = re.compile(r'\w+(?:\?|\.|ly\b)')
-        endingMatch = specificEndingPattern.match(''.join(currToken))
-        endingToken = None
-        if endingMatch != None:
-            endingToken = endingMatch.group()
-            # print "capitalToken is " + str(capitalToken)
-
-        specificStartPattern = re.compile(r'\b[unUn]\w+')
-        startMatch = specificStartPattern.match(''.join(currToken))
-        unToken = None
-        if startMatch != None:
-            unToken = startMatch.group()
-            # print "capitalToken is " + str(capitalToken)
-
-        specificStart1Pattern = re.compile(r'\b[inIn]\w+')
-        start1Match = specificStart1Pattern.match(''.join(currToken))
-        inToken = None
-        if start1Match != None:
-            inToken = start1Match.group()
-            # print "capitalToken is " + str(capitalToken)
-
-
-
-        # capitalSearchTerm = re.search(capitalPattern, currToken)
-        # capitalToken = capitalSearchTerm.group()
-        #
-        # print "CAPITAL TOKEN: " + str(capitalToken)
-        # cardinalToken = re.search(cardinalPattern, currToken)
-        # endingToken = re.search(specificEndingPattern, currToken)
-        # unToken = re.search(specificStartPattern, currToken)
-        # inToken = re.search(specificStart1Pattern, currToken)
-        # if capitalToken.group() != None:
-        #     capitalToken.group()
-        #     print "capitalToken match: " + str(capitalToken)
-
-
-        def openBracket():
-            print "[",
-
-        def closeBracket():
-            print "]"
-
-        def capitalNoun():
-            # print "REACHED HERE"
-            theMaxPOS = "NNP"
-            print currToken + "/" + str(theMaxPOS)
-        def cardinalNumber():
-            # print "REACHED HERE"
-            theMaxPOS = "CD"
-            print currToken + "/" + str(theMaxPOS)
-        def specificEnding():
-            theMaxPOS = "RB"
-            print currToken + "/" + str(theMaxPOS)
-
-        def specificStart():
-            theMaxPOS = "JJ"
-            print currToken + "/" + str(theMaxPOS)
-
-        def specificStart1():
-            theMaxPOS = "JJ"
-            print currToken + "/" + str(theMaxPOS)
-
-        def default():
-            #print "default:"
-
-            resultingPOS = wordDict.get(currToken,None)
-            # print "resultingPOS: " + str(resultingPOS)
-            theMaxPOS = findMostFrequent(resultingPOS)
-            # cardinalNumber = re.compile(r'[0-9]')
-            # if cardinalNumber.match(''.join(currToken)):
-            #     theMaxPOS = "CD"
-            # print "theMaxPOS: " + str(theMaxPOS)
-            # for i in punct:
-            #     # print i
-            #     if theMaxPOS == i:
-            #         print currToken + "/" + theMaxPOS
-            #     else:
-            #         print currToken + "/" + theMaxPOS,
-            print currToken + "/" + str(theMaxPOS)
-
-        switcher = {
-            '[': openBracket,
-            ']': closeBracket,
-            capitalToken: capitalNoun,
-            cardinalToken: cardinalNumber,
-            endingToken: specificEnding,
-            unToken: specificStart,
-            inToken: specificStart1,
-        }
-
-        def switch(currToken):
-            #print "I got here [1] " + currToken
-            return switcher.get(currToken, default)()
-
-        switch(currToken)
-
-        # if currToken == "]" or currToken == "[":
-        #     print "Token was a ]: " + currToken
-        #     print "]"
-        # if currToken == "[":
-        #     print "Token was a [: " + currToken
-        #     print "["
-        # else:
-        #     print "in else statement, currToken " + currToken
-
-            # print "Word: " + currToken + " POS: " + theMaxPOS
-
-
-    # stringToken = str(tokens)
-    # create_tokens(tokens, wordDict)
-
-    # print "stringToken are " + stringToken + "\n"
-    # print "firstWord is " + str(firstWord) + "\n"
-
-
-    # print "Tokens are " + str(tokens) + "\n"
-
-#Find most frequent occurence in posDict
-def findMostFrequent(resultingPOS):
-
-    maxPOS = None
-    maxFreq = 0
-
-    # print "resultingPOS: " + str(resultingPOS)
-
-    if resultingPOS == None:
-        # print "Did not exist in wordDict"
-        maxPOS = "NN"
-        # print "should have inserted it"
-
-
-    else:
-        for pos,frequency in resultingPOS.items():
-            if maxFreq < frequency:
-                maxFreq = frequency
-                maxPOS = pos
-        # print "(inside for loop) maxPOS: " + maxPOS
-    # print "(outside for loop) maxPOS: " + maxPOS
-
-
-    # def emptyPos():
-    #     maxPOS = "NN"
-    #
-    # def closeBracket():
-    #     print "]"
-    #
-    # def default():
-    #     #print "default:"
-    #     resultingPOS = wordDict.get(currToken,None)
-    #     # print "resultingPOS: " + str(resultingPOS)
-    #     theMaxPOS = findMostFrequent(resultingPOS)
-    #     # print "theMaxPOS: " + str(theMaxPOS)
-    #     # for i in punct:
-    #     #     # print i
-    #     #     if theMaxPOS == i:
-    #     #         print currToken + "/" + theMaxPOS
-    #     #     else:
-    #     #         print currToken + "/" + theMaxPOS,
-    #     print currToken + "/" + str(theMaxPOS)
-    #
-    # switcher = {
-    #     '[': openBracket,
-    #     ']': closeBracket,
-    # }
-    #
-    # def switch(currToken):
-    #     #print "I got here [1] " + currToken
-    #     return switcher.get(currToken, default)()
-    #
-    # switch(currToken)
-
-    return maxPOS
-
-#Dealing with the training file tokens
 def generate_tokens(s):
-    # print "loading in contents"
-    # Convert to lowercases
-    # s = s.lower()
 
-    # Replace all brackets with empty
-    s = re.sub("[\[\]]", '', s)
+    resultingSenseId = None
+    # s = re.sub("[\[\]]", '', s)
 
     # Replace new lines with spaces
     s = re.sub(r'\s+', ' ', s)
@@ -370,82 +236,33 @@ def generate_tokens(s):
     # Break sentence into the tokens, remove empty tokens
     tokens = [token for token in s.split(" ") if token != ""]
 
-    # stringToken = str(tokens)
-    create_tokens(tokens, wordDict)
-
-    # for key,val in wordDict.items():
-    #     print key, "=>", val
-
-    # print "stringToken are " + stringToken + "\n"
-    # print "firstWord is " + str(firstWord) + "\n"
-
-    # print "Tokens are " + str(tokens) + "\n"
+    # print ("Token is: " + str(tokens) + "\n")
 
 
+    count = 0
 
-#split the 3 part token into 3 individual parts
-def create_tokens(tokens, wordDict):
+    for i in range(len(arrayOfFunctions)):
+        f = arrayOfFunctions[i]
+        # print ("f=" + str(f))
 
-    # wordToken = [stringToken for stringToken in stringToken.split('/') if stringToken !=""]
-    # posToken = [stringToken for stringToken in stringToken.split('/') if stringToken !=""]
-    # print tokens
+        resultingSenseId = f(tokens)
 
-    for i in range(len(tokens)):
-        # print "Tokens {}: {}".format(i+1, tokens[i])
-        currToken = tokens[i]
-        # print "currToken: " + currToken
-        splitTokens = currToken.split('/')
-        # if currToken == '[':
-        #     print "token is " + currToken
-        # if currToken == ']':
-        #     print "token is " + currToken
-        # else:
-        # print "splitTokens are " + str(splitTokens) + "\n"
+        if resultingSenseId == "phone":
+            index = i
+            print ("index is: " + str(index))
+            frequencyArray[index] += 1
 
-        wordToken = splitTokens[0]
+            print("frequencyArray " + str(frequencyArray[index]))
 
-        posToken = splitTokens[1]
+        print ("resultingSenseId is: " + str(resultingSenseId))
 
-        # capitalLetter = re.compile(r'.*?[A-Z].*?')
-        # if capitalLetter.match(''.join(wordToken)):
-        #     posToken = "NNP"
+        # print ("resultingSenseId is: " + str(resultingSenseId) + " count " + str(count))
 
-        generate_frequencies(wordToken, posToken, wordDict)
+        # count += 1
+        # print ("Count is: " + str(count))
 
-        # for word in wordDict:
-        #     print "wordDict contains " + word + "\n"
+    return resultingSenseId
 
-        # print "wordToken is " + str(wordToken) + "\n"
-        # print "posToken is " + str(posToken) + "\n"
-
-    # tokenDict.append(wordToken)
-
-    # print "PosToken are " + posToken + "\n"
-
-def generate_frequencies(wordToken, posToken, wordDict):
-
-    if wordToken in wordDict:
-                # print "incrementing posDict " + wordToken + " count"
-                posDict = wordDict[wordToken]
-                if posDict is not None:
-                    if posToken in posDict:
-                        posDict[posToken] += 1
-                    else:
-                        posDict[posToken] = 1
-                else:
-                    posDict = { posToken : 1 }
-                    wordDict[wordToken] = posDict
-    else:
-        # print "adding wordToken " + "|" + wordToken + "|" + " to wordDict"
-        posDict = { posToken : 1 }
-        wordDict[wordToken] = posDict
-        # print ("Buffer after newNgram is added to ngramDict " + " len(lookBackBuffer): " + str(len(lookBackBuffer))
-        #     + " ngramSize: " + str(ngramSize))
-    # for key,val in wordDict.items():
-    #     print key, "=>", val
-    # for key,val in posDict.items():
-    #     print key, "=>", val
-    # findMostFrequent(posDict)
 
 
 if __name__ == "__main__":
