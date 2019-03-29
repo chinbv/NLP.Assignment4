@@ -1,0 +1,201 @@
+Script started on Fri Mar 29 02:53:06 2019
+[?1034hbash-3.2$ python3 decision-list [K.py line-s[Ktrain.txt line-test.txt my-decision-list.xt > my[K[K[K[K[K[K[K[Kt[K.txt > my-line-ansers[K[K[Kwers.txt
+bash-3.2$ head -50 my-decision-list.txt
+feature[0] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] did not select senseid="phone"
+feature[1] did not select senseid="phone"
+feature[2] did not select senseid="phone"
+feature[3] did not select senseid="phone"
+Selected senseid="product"
+feature[0] selected senseid="phone"
+feature[0] selected senseid="phone"
+feature[0] did not select senseid="phone"
+feature[1] selected senseid="phone"
+bash-3.2$ head -10 my-line-answers.txt
+<answer instance="line-n.w8_059:8174:" senseid="phone"/>
+<answer instance="line-n.w7_098:12684:" senseid="phone"/>
+<answer instance="line-n.w8_106:13309:" senseid="phone"/>
+<answer instance="line-n.w9_40:10187:" senseid="product"/>
+<answer instance="line-n.w9_16:217:" senseid="product"/>
+<answer instance="line-n.w8_119:16927:" senseid="product"/>
+<answer instance="line-n.w8_008:13756:" senseid="phone"/>
+<answer instance="line-n.w8_041:15186:" senseid="phone"/>
+<answer instance="line-n.art7} aphb 05601797:" senseid="product"/>
+<answer instance="line-n.w8_119:2964:" senseid="phone"/>
+bash-3.2$ python3 scorer.py my-line-answers.txt line-key.txt
+90.57971014492753% CORRECT
+9.420289855072465% INCORRECT
+<answer <answer 126
+instance="line-n.w8_059:8174:" instance="line-n.w8_059:8174:" 1
+  126
+instance="line-n.w7_098:12684:" instance="line-n.w7_098:12684:" 1
+instance="line-n.w8_106:13309:" instance="line-n.w8_106:13309:" 1
+instance="line-n.w9_40:10187:" instance="line-n.w9_40:10187:" 1
+instance="line-n.w9_16:217:" instance="line-n.w9_16:217:" 1
+instance="line-n.w8_119:16927:" instance="line-n.w8_119:16927:" 1
+instance="line-n.w8_008:13756:" instance="line-n.w8_008:13756:" 1
+instance="line-n.w8_041:15186:" instance="line-n.w8_041:15186:" 1
+instance="line-n.art7} instance="line-n.art7} 18
+aphb aphb 18
+05601797:" 05601797:" 1
+instance="line-n.w8_119:2964:" instance="line-n.w8_119:2964:" 1
+instance="line-n.w7_040:13652:" instance="line-n.w7_040:13652:" 1
+instance="line-n.w7_122:2194:" instance="line-n.w7_122:2194:" 1
+45903907:" 45903907:" 1
+43602625:" 43602625:" 1
+instance="line-n.w8_034:3995:" instance="line-n.w8_034:3995:" 1
+instance="line-n.w8_139:696:" instance="line-n.w8_139:696:" 1
+20801955:" 20801955:" 1
+instance="line-n.w8_028:3156:" instance="line-n.w8_028:3156:" 1
+19600919:" 19600919:" 1
+instance="line-n.w8_111:8071:" instance="line-n.w8_111:8071:" 1
+instance="line-n.w7_041:4840:" instance="line-n.w7_041:4840:" 1
+instance="line-n.w7_074:3928:" instance="line-n.w7_074:3928:" 1
+instance="line-n.w8_049:15000:" instance="line-n.w8_049:15000:" 1
+instance="line-n.w8_086:3306:" instance="line-n.w8_086:3306:" 1
+instance="line-n.w9_8:1533:" instance="line-n.w9_8:1533:" 1
+instance="line-n.w8_042:5289:" instance="line-n.w8_042:5289:" 1
+instance="line-n.w7_041:11151:" instance="line-n.w7_041:11151:" 1
+instance="line-n.w7_059:9261:" instance="line-n.w7_059:9261:" 1
+instance="line-n.w9_6:10969:" instance="line-n.w9_6:10969:" 1
+41702230:" 41702230:" 1
+instance="line-n.w7_004:1365:" instance="line-n.w7_004:1365:" 1
+26902918:" 26902918:" 1
+37804749:" 37804749:" 1
+instance="line-n.w9_6:2907:" instance="line-n.w9_6:2907:" 1
+instance="line-n.w7_106:10827:" instance="line-n.w7_106:10827:" 1
+02400926:" 02400926:" 1
+instance="line-n.w7_107:12000:" instance="line-n.w7_107:12000:" 1
+instance="line-n.w7_087:620:" instance="line-n.w7_087:620:" 1
+30203503:" 30203503:" 1
+instance="line-n.w9_40:10216:" instance="line-n.w9_40:10216:" 1
+24500349:" 24500349:" 1
+02200986:" 02200986:" 1
+instance="line-n.w8_024:3051:" instance="line-n.w8_024:3051:" 1
+instance="line-n.w7_023:17827:" instance="line-n.w7_023:17827:" 1
+instance="line-n.w8_142:13364:" instance="line-n.w8_142:13364:" 1
+instance="line-n.w8_083:14895:" instance="line-n.w8_083:14895:" 1
+instance="line-n.w7_117:10197:" instance="line-n.w7_117:10197:" 1
+instance="line-n.w8_013:14047:" instance="line-n.w8_013:14047:" 1
+instance="line-n.w7_019:14634:" instance="line-n.w7_019:14634:" 1
+instance="line-n.w7_017:6376:" instance="line-n.w7_017:6376:" 1
+24900680:" 24900680:" 1
+instance="line-n.w7_021:3496:" instance="line-n.w7_021:3496:" 1
+instance="line-n.w9_13:9355:" instance="line-n.w9_13:9355:" 1
+instance="line-n.w8_098:13314:" instance="line-n.w8_098:13314:" 1
+instance="line-n.w8_064:14051:" instance="line-n.w8_064:14051:" 1
+instance="line-n.w7_107:7711:" instance="line-n.w7_107:7711:" 1
+instance="line-n.w9_40:10241:" instance="line-n.w9_40:10241:" 1
+instance="line-n.w7_111:6250:" instance="line-n.w7_111:6250:" 1
+instance="line-n.w9_31:14204:" instance="line-n.w9_31:14204:" 1
+instance="line-n.w9_20:7066:" instance="line-n.w9_20:7066:" 1
+instance="line-n.w8_027:13714:" instance="line-n.w8_027:13714:" 1
+instance="line-n.w7_006:6674:" instance="line-n.w7_006:6674:" 1
+instance="line-n.w7_080:1471:" instance="line-n.w7_080:1471:" 1
+instance="line-n.w7_124:728:" instance="line-n.w7_124:728:" 1
+instance="line-n.w7_083:9304:" instance="line-n.w7_083:9304:" 1
+instance="line-n.w8_019:4936:" instance="line-n.w8_019:4936:" 1
+instance="line-n.w9_17:14207:" instance="line-n.w9_17:14207:" 1
+instance="line-n.w7_093:5547:" instance="line-n.w7_093:5547:" 1
+instance="line-n.w7_085:427:" instance="line-n.w7_085:427:" 1
+instance="line-n.w7_112:2163:" instance="line-n.w7_112:2163:" 1
+instance="line-n.w7_115:6602:" instance="line-n.w7_115:6602:" 1
+instance="line-n.w8_081:8566:" instance="line-n.w8_081:8566:" 1
+instance="line-n.w8_104:2916:" instance="line-n.w8_104:2916:" 1
+instance="line-n.w7_050:15645:" instance="line-n.w7_050:15645:" 1
+instance="line-n.w7_033:3398:" instance="line-n.w7_033:3398:" 1
+instance="line-n.w9_8:3899:" instance="line-n.w9_8:3899:" 1
+37805623:" 37805623:" 1
+instance="line-n.w8_016:14692:" instance="line-n.w8_016:14692:" 1
+instance="line-n.w7_107:826:" instance="line-n.w7_107:826:" 1
+instance="line-n.w7_002:18532:" instance="line-n.w7_002:18532:" 1
+instance="line-n.w7_102:12660:" instance="line-n.w7_102:12660:" 1
+instance="line-n.w8_002:7541:" instance="line-n.w8_002:7541:" 1
+instance="line-n.w8_063:10855:" instance="line-n.w8_063:10855:" 1
+18601882:" 18601882:" 1
+instance="line-n.w9_7:13171:" instance="line-n.w9_7:13171:" 1
+instance="line-n.w9_32:1867:" instance="line-n.w9_32:1867:" 1
+instance="line-n.w9_29:3437:" instance="line-n.w9_29:3437:" 1
+instance="line-n.w7_019:18445:" instance="line-n.w7_019:18445:" 1
+45700442:" 45700442:" 1
+instance="line-n.w8_067:14552:" instance="line-n.w8_067:14552:" 1
+instance="line-n.w8_053:16416:" instance="line-n.w8_053:16416:" 1
+instance="line-n.w9_12:680:" instance="line-n.w9_12:680:" 1
+instance="line-n.w9_8:1503:" instance="line-n.w9_8:1503:" 1
+instance="line-n.w7_066:3322:" instance="line-n.w7_066:3322:" 1
+instance="line-n.w8_100:4429:" instance="line-n.w8_100:4429:" 1
+instance="line-n.w7_104:8687:" instance="line-n.w7_104:8687:" 1
+54101892:" 54101892:" 1
+instance="line-n.w8_038:1345:" instance="line-n.w8_038:1345:" 1
+instance="line-n.w7_126:14239:" instance="line-n.w7_126:14239:" 1
+instance="line-n.w9_30:3935:" instance="line-n.w9_30:3935:" 1
+instance="line-n.w9_18:11863:" instance="line-n.w9_18:11863:" 1
+instance="line-n.w8_003:16519:" instance="line-n.w8_003:16519:" 1
+29604729:" 29604729:" 1
+instance="line-n.w9_38:10638:" instance="line-n.w9_38:10638:" 1
+instance="line-n.w7_046:6144:" instance="line-n.w7_046:6144:" 1
+instance="line-n.w8_098:14382:" instance="line-n.w8_098:14382:" 1
+instance="line-n.w8_074:4317:" instance="line-n.w8_074:4317:" 1
+instance="line-n.w7_011:18280:" instance="line-n.w7_011:18280:" 1
+instance="line-n.w8_053:3883:" instance="line-n.w8_053:3883:" 1
+instance="line-n.w8_040:16402:" instance="line-n.w8_040:16402:" 1
+instance="line-n.w7_065:13727:" instance="line-n.w7_065:13727:" 1
+instance="line-n.w8_007:14740:" instance="line-n.w8_007:14740:" 1
+instance="line-n.w8_011:260:" instance="line-n.w8_011:260:" 1
+instance="line-n.w7_003:8955:" instance="line-n.w7_003:8955:" 1
+instance="line-n.w8_011:298:" instance="line-n.w8_011:298:" 1
+instance="line-n.w7_122:11595:" instance="line-n.w7_122:11595:" 1
+instance="line-n.w9_1:4358:" instance="line-n.w9_1:4358:" 1
+instance="line-n.w7_108:11591:" instance="line-n.w7_108:11591:" 1
+instance="line-n.w8_065:17112:" instance="line-n.w8_065:17112:" 1
+instance="line-n.w8_070:8114:" instance="line-n.w8_070:8114:" 1
+instance="line-n.w8_011:13061:" instance="line-n.w8_011:13061:" 1
+instance="line-n.w7_100:15579:" instance="line-n.w7_100:15579:" 1
+instance="line-n.w7_071:6321:" instance="line-n.w7_071:6321:" 1
+instance="line-n.w8_110:14049:" instance="line-n.w8_110:14049:" 1
+instance="line-n.w7_108:4296:" instance="line-n.w7_108:4296:" 1
+instance="line-n.w7_057:1203:" instance="line-n.w7_057:1203:" 1
+bash-3.2$ exit
+exit
+
+Script done on Fri Mar 29 02:54:17 2019

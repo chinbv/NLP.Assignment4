@@ -3,12 +3,12 @@
 ##############################################################################################################################################################################################################################################################################
 #####
 ##### Brandon Chin
-##### Monday, March 18th, 2019
+##### Monday, March 29th, 2019
 ##### CMSC 416 - Natural Language Processing
-##### Programming Assignment 3 - POS Tagger
+##### Programming Assignment 4 - Decision-list
 #####
 ##### 1. The Problem
-##### Write a perl (or python3) program called tagger.(pl|py) which will take as input a training file containing part of speech tagged text, and a file containing text to be part of speech tagged.
+##### Write a Perl (or Python3) program called decision-list.pl that implements a decision list classifier to perform word sense disambiguation.
 #####
 ##### 2. Example Input/Output
 #####
@@ -94,9 +94,11 @@ from random import *
 import operator
 
 myBagOfWords={}
+# text_file = None
 
 
 def main():##main method
+
 
     # print("This program tags words with POS.")
     # print("Created by Brandon Chin")
@@ -134,9 +136,25 @@ def main():##main method
 
     # print("feature4Vector is " + str(feature4Vector))
 
+    decisionListFunctions=[]
+    decisionListVectors=[]
+
+    decisionListFunctions.append(evaluateFeature1)
+    decisionListFunctions.append(evaluateFeature2)
+    decisionListFunctions.append(evaluateFeature3)
+    decisionListFunctions.append(evaluateFeature4)
+    decisionListVectors.append(feature1Vector)
+    decisionListVectors.append(feature2Vector)
+    decisionListVectors.append(feature3Vector)
+    decisionListVectors.append(feature4Vector)
+
+    testFilename = sys.argv[2]
+
+    evaluateTestFile(testFilename, decisionListFunctions, decisionListVectors, sys.argv[3])
 
 
-def contextLinesFromFile(filename):
+
+def contextLinesFromTrainingFile(filename):
 
     loadFileName = filename
     f = open(loadFileName,"r")
@@ -150,7 +168,7 @@ def contextLinesFromFile(filename):
     for line in contents:
         if "<answer" in line:
             answerLine = line
-            print ("answerLine: " + answerLine)
+            # print ("answerLine: " + answerLine)
 
                 # print("line is: " + line)
 
@@ -161,7 +179,7 @@ def contextLinesFromFile(filename):
             if phoneMatch is not None:
                 phoneToken = phoneMatch.group()
 
-            print ("senseid is a " + str(phoneToken))
+            # print ("senseid is a " + str(phoneToken))
 
         if "<context>" in line and phoneToken == 'phone':
             aboutToCollectContents = True
@@ -199,7 +217,7 @@ def contextLinesFromFile(filename):
 #generating the bag of words
 def generate_bagOfWords(trainingFilename):
 
-    contextLines = contextLinesFromFile(trainingFilename)
+    contextLines = contextLinesFromTrainingFile(trainingFilename)
 
     for line in contextLines:
         # Break sentence into the tokens, remove empty tokens
@@ -215,13 +233,169 @@ def generate_bagOfWords(trainingFilename):
 
     return myBagOfWords
 
+def evaluateTestFile(filename, decisionListFunctions, decisionListVectors, logFilename):
 
+    loadFileName = filename
+    f = open(loadFileName,"r")
+    contents = f.readlines()
+    f.close()
+
+    log_file = open(logFilename,"w")
+    # print ("log_file is " + str(log_file))
+    #
+    # if log_file == None:
+    #     print ("log_file is none")
+
+    aboutToCollectContents = False
+    instanceLine = None
+
+    for line in contents:
+        if "<instance" in line:
+            instanceLine = line
+            instanceLine = re.sub(r'<instance id=', '', instanceLine)
+            instanceLine = re.sub(r'>', ' ', instanceLine)
+            instanceLine = re.sub(r'\s+', ' ', instanceLine)
+
+            # print ("instanceLine: " + instanceLine)
+
+        if "<context>" in line:
+            aboutToCollectContents = True
+        else:
+            if aboutToCollectContents == True:
+                # Replace new lines with spaces
+                line = re.sub(r'\s+', ' ', line)
+
+                line = line.lower()
+
+                # print("Line before the stopWords: " + line)
+
+                # List of stopWords to be removed
+                stopWords=['a','an','and','are','as','at','be','by','for','from','has','he','in',
+                'is','it','its','of','on','that','the','to','was','were','will','with']
+
+                tagWords=['<s>','</s>','<@>','<p>','</p>']
+
+                punctuation=[',','.','!','?','"','--']
+
+                line = ' '.join([word for word in line.split() if word not in stopWords])
+
+                line = ' '.join([word for word in line.split() if word not in tagWords])
+
+                line = ' '.join([word for word in line.split() if word not in punctuation])
+
+                # print("Line after the stopWords: " + line)
+
+                evaluateFeatures(instanceLine, line, decisionListFunctions, decisionListVectors,log_file)
+                aboutToCollectContents = False
+    log_file.close()
+
+def evaluateFeatures(instanceLine, contextLine, decisionListFunctions, decisionListVectors,log_file):
+    # print("<answer instance=" + instanceLine)
+
+    resultBoolean = False
+    featureIndex = 0
+
+    # if log_file == None:
+    #     print ("logFile is none")
+
+    while(resultBoolean == False and featureIndex < len(decisionListFunctions)):
+        resultBoolean = decisionListFunctions[featureIndex](decisionListVectors[featureIndex],instanceLine,contextLine)
+
+        if resultBoolean == True:
+            senseid = "phone"
+            log_file.write("feature["+str(featureIndex)+"] selected senseid=\"" + str(senseid)+"\""+"\n")
+        else:
+            log_file.write("feature["+str(featureIndex)+"] did not select senseid=\"phone\""+"\n")
+        featureIndex += 1
+    if(resultBoolean == False):
+        # none of the evaluations resulted in phone, so then assuming it is a product
+        senseid = "product"
+        log_file.write("Selected senseid=\"" + str(senseid)+"\""+"\n")
+
+    print("<answer instance=" + instanceLine + "senseid=\""+senseid+"\"/>")
+
+
+
+def evaluateFeature1(feature1Vector,instanceLine,contextLine):
+    returnValue = False
+
+    contextLineList = contextLine.split("<head>")
+    if len(contextLineList) == 2:##the target word is at the start of the line, so no before string
+        beforeString = contextLineList[0]
+        beforeStringTokens = beforeString.split(" ")
+        lastToken = beforeStringTokens[-2] #because -1 is an ending space
+
+        value = feature1Vector.get(lastToken)
+        if value is not None and value == 1:
+            returnValue = True
+        # print("beforeString is " + str(beforeString))
+        # print("beforeStringTokens is " + str(beforeStringTokens))
+        # print("lastToken is " + lastToken)
+
+    return returnValue
+
+def evaluateFeature2(feature2Vector,instanceLine,contextLine):
+    returnValue = False
+
+    contextLineList = contextLine.split("<head>")
+    if len(contextLineList) == 2:##the target word is at the start of the line, so no before string
+        beforeString = contextLineList[0]
+        beforeStringTokens = beforeString.split(" ")
+        if len(beforeStringTokens) >= 3:
+            lastToken = beforeStringTokens[-3] #because -1 is an ending space
+
+            value = feature2Vector.get(lastToken)
+            if value is not None and value == 1:
+                returnValue = True
+        # print("beforeString is " + str(beforeString))
+        # print("beforeStringTokens is " + str(beforeStringTokens))
+        # print("lastToken is " + lastToken)
+
+    return returnValue
+
+def evaluateFeature3(feature3Vector,instanceLine,contextLine):
+    returnValue = False
+
+    contextLineList = contextLine.split("<head>")
+    if len(contextLineList) == 2:##the target word is at the start of the line, so no before string
+        afterString = contextLineList[1]
+        afterStringTokens = afterString.split(" ")
+        if len(afterStringTokens) >= 2:
+            firstToken = afterStringTokens[1]
+
+            value = feature3Vector.get(firstToken)
+            if value is not None and value == 1:
+                returnValue = True
+            # print("beforeString is " + str(beforeString))
+            # print("beforeStringTokens is " + str(beforeStringTokens))
+            # print("[Test] firstToken is " + firstToken)
+
+    return returnValue
+
+def evaluateFeature4(feature4Vector,instanceLine,contextLine):
+    returnValue = False
+
+    contextLineList = contextLine.split("<head>")
+    if len(contextLineList) == 2:##the target word is at the end of the line, so no after string
+        afterString = contextLineList[1]
+        afterStringTokens = afterString.split(" ")
+        if len(afterStringTokens) >= 3:
+            firstToken = afterStringTokens[2]
+
+            value = feature4Vector.get(firstToken)
+            if value is not None and value == 1:
+                returnValue = True
+        # print("beforeString is " + str(beforeString))
+        # print("beforeStringTokens is " + str(beforeStringTokens))
+        # print("[Test] firstToken is " + firstToken)
+
+    return returnValue
 
 
 #Feature gets the word before the <head> tag
 def feature1Training(feature1Vector, trainingFilename):
 
-    contextLines = contextLinesFromFile(trainingFilename)
+    contextLines = contextLinesFromTrainingFile(trainingFilename)
 
     for contextLine in contextLines:
         contextLineList = contextLine.split("<head>")
@@ -229,21 +403,22 @@ def feature1Training(feature1Vector, trainingFilename):
 
             beforeString = contextLineList[0]
             beforeStringTokens = beforeString.split(" ")
-            lastToken = beforeStringTokens[-2] #because -1 is an ending space
+            if len(beforeStringTokens) >= 2:
+                lastToken = beforeStringTokens[-2] #because -1 is an ending space
 
-            # print("beforeString is " + str(beforeString))
-            # print("beforeStringTokens is " + str(beforeStringTokens))
-            # print("lastToken is " + lastToken)
+                # print("beforeString is " + str(beforeString))
+                # print("beforeStringTokens is " + str(beforeStringTokens))
+                # print("lastToken is " + lastToken)
 
-            feature1Vector[lastToken] = 1
-            print(lastToken +" was added to vector")
+                feature1Vector[lastToken] = 1
+                # print(lastToken +" was added to vector")
 
     return feature1Vector
 
 #Feature gets the word 2 before the <head> tag
 def feature2Training(feature2Vector, trainingFilename):
 
-    contextLines = contextLinesFromFile(trainingFilename)
+    contextLines = contextLinesFromTrainingFile(trainingFilename)
 
     for contextLine in contextLines:
         contextLineList = contextLine.split("<head>")
@@ -255,14 +430,14 @@ def feature2Training(feature2Vector, trainingFilename):
 
                 feature2Vector[lastToken] = 1
 
-                print(lastToken +" was added to vector")
+                # print(lastToken +" was added to vector")
 
     return feature2Vector
 
 #Feature gets the word after the <head> tag
 def feature3Training(feature3Vector, trainingFilename):
 
-    contextLines = contextLinesFromFile(trainingFilename)
+    contextLines = contextLinesFromTrainingFile(trainingFilename)
 
     for contextLine in contextLines:
         contextLineList = contextLine.split("<head>")
@@ -270,41 +445,42 @@ def feature3Training(feature3Vector, trainingFilename):
 
             afterString = contextLineList[1]
             afterStringTokens = afterString.split(" ")
-            firstToken = afterStringTokens[0]
+            if len(afterStringTokens) >= 2:
+                firstToken = afterStringTokens[1]
 
 
-            feature3Vector[firstToken] = 1
+                feature3Vector[firstToken] = 1
 
-            # print("contextLineList is " + str(contextLineList))
-            # print("afterString is " + str(afterString))
-            # print("afterStringTokens is " + str(afterStringTokens))
-            # print("firstToken is " + firstToken)
+                # print("contextLineList is " + str(contextLineList))
+                # print("afterString is " + str(afterString))
+                # print("afterStringTokens is " + str(afterStringTokens))
+                # print("[Training] firstToken is " + firstToken)
 
-            print(firstToken +" was added to vector")
+            # print(firstToken +" was added to vector")
 
     return feature3Vector
 
 #Feature gets the word 2 after the <head> tag
 def feature4Training(feature4Vector, trainingFilename):
 
-    contextLines = contextLinesFromFile(trainingFilename)
+    contextLines = contextLinesFromTrainingFile(trainingFilename)
 
     for contextLine in contextLines:
         contextLineList = contextLine.split("<head>")
         if len(contextLineList) == 2:##the target word is at the end of the line, so no after string
             afterString = contextLineList[1]
             afterStringTokens = afterString.split(" ")
-            if len(afterStringTokens) >= 2:
-                firstToken = afterStringTokens[1]
+            if len(afterStringTokens) >= 3:
+                firstToken = afterStringTokens[2]
 
                 feature4Vector[firstToken] = 1
 
-                print(firstToken +" was added to vector")
+                # print(firstToken +" was added to vector")
 
             # print("contextLineList is " + str(contextLineList))
             # print("afterString is " + str(afterString))
             # print("afterStringTokens is " + str(afterStringTokens))
-            # print("firstToken is " + firstToken)
+            # print("[Training] firstToken is " + firstToken)
 
     return feature4Vector
 

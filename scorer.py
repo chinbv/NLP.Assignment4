@@ -4,9 +4,9 @@
 ##############################################################################################################################################################################################################################################################################
 #####
 ##### Brandon Chin
-##### Monday, March 18th, 2019
+##### Monday, March 29th, 2019
 ##### CMSC 416 - Natural Language Processing
-##### Programming Assignment 3 - POS Tagger
+##### Programming Assignment 4 - POS Tagger
 #####
 ##### 1. The Problem
 ##### Write a perl (or python3) program called tagger.(pl|py) which will take as input a training file containing part of speech tagged text, and a file containing text to be part of speech tagged.
@@ -79,27 +79,21 @@
 
 ### Rules and Accuracy
 ##
-## 1. With no additional rules except for most frequent pos
-# 84.4396733774% CORRECT
-# 15.5603266226% INCORRECT
-## 2. Any capital letter means a POS with NNP, and then most frequent pos
-# 85.6997043503% CORRECT
-# 14.3002956497% INCORRECT
-## 3. Any number that is read in is classified as CD, and then most frequent pos
-# 85.1981557089% CORRECT
-# 14.8018442911% INCORRECT
-## 4. Any word that ends in -ly is classified as RB, and then most frequent pos
-# 83.3538645643% CORRECT
-# 16.6461354357% INCORRECT
-## 5. Any word that begins with un- or Un- is classified as JJ, and then most frequent pos
-# 83.3186681684% CORRECT
-# 16.6813318316% INCORRECT
-## 6. Any word that begins with in- or In- is classified as JJ, and then most frequent pos
-# 78.6956215684% CORRECT
-# 21.3043784316% INCORRECT
-## 6. Combination of all the rules
-# 79.4470646206% CORRECT
-# 20.5529353794% INCORRECT
+## 1. Feature 1
+# 91.78743961352657% CORRECT
+# 8.212560386473431% INCORRECT
+## 2. Feature 2
+# 86.95652173913044% CORRECT
+# 13.043478260869565% INCORRECT
+## 3. Feature 3
+# 85.02415458937197% CORRECT
+# 14.975845410628018% INCORRECT
+## 4. Feature 4
+# 82.6086956521739% CORRECT
+# 17.391304347826086% INCORRECT
+## 5. Overall
+# 90.57971014492753% CORRECT
+# 9.420289855072465% INCORRECT
 
 import re
 import sys
@@ -121,23 +115,9 @@ def main():##main method
     fTestFile = None
     fKeyFile = None
 
-    # while argsIndex <= numberOfArgs:
-    #     loadFileName = sys.argv[argsIndex]
-    #     # print "opening file " + loadFileName
-    #     # f = open(loadFileName,"r")
-    #     # contents = f.read()
-    #     # f.close()
-    #     # print contents + "\n"
-    #     fTestFile = sys.argv[1]
-    #     fKeyFile = sys.argv[2]
-    #     print "fTestFile: " + str(fTestFile)
-    #     print "fKeyFile: " + str(fKeyFile)
-    #     argsIndex += 1
 
     fTestFile = sys.argv[1]
     fKeyFile = sys.argv[2]
-    # print "fTestFile: " + str(fTestFile)
-    # print "fKeyFile: " + str(fKeyFile)
 
     with open(fTestFile) as fT1:
         with open(fKeyFile) as fK1:
@@ -147,13 +127,6 @@ def main():##main method
             keyTokens = generate_tokens(contentsKey)
         fT1.close()
         fK1.close()
-
-    # for i in testTokens:
-    #     for j in keyTokens:
-    #         if i == j:
-    #             print "Matched: " + str(i) + " " + str(j)
-    #         else:
-    #             print "Did not match: " + str(i) + " " + str(j)
 
     correctCount = 0
     incorrectCount = 0
@@ -166,18 +139,11 @@ def main():##main method
         testTokensValue = testTokensValue.replace("\/", "")
         if testTokensValue == keyTokensValue:
             # print "It matched " + str(testTokensValue) + " " + str(keyTokensValue)
-            testSplitTokens = testTokensValue.split('/')
-            testPosToken = testSplitTokens[1]
-            # print "testPosToken: " + testPosToken
+            testSplitTokens = testTokensValue.split('senseid=')
+            testPosToken = testSplitTokens[0]
 
-            # if keyTokensValue[1] == '/':
-            #     testingToken0 = keyTokensValue[0]
-            #     testingToken2 = keyTokensValue[2]
-            #
-            #     print "testingToken0: " + testingToken0 + " testingToken2: " + testingToken2
-
-            keySplitTokens = keyTokensValue.split('/')
-            keyPosToken = keySplitTokens[1]
+            keySplitTokens = keyTokensValue.split('senseid=')
+            keyPosToken = keySplitTokens[0]
 
             # print "keyPosToken: " + keyPosToken
 
@@ -187,14 +153,14 @@ def main():##main method
 
         else:
             # print "Did not match " + str(testTokens[i]) + " " + str(keyTokensValue)
-            testSplitTokens = testTokensValue.split('/')
-            testPosToken = testSplitTokens[1]
+            testSplitTokens = testTokensValue.split('senseid=')
+            testPosToken = testSplitTokens[0]
 
             # print "testPosToken: " + testPosToken
 
 
-            keySplitTokens = keyTokensValue.split('/')
-            keyPosToken = keySplitTokens[1]
+            keySplitTokens = keyTokensValue.split('senseid=')
+            keyPosToken = keySplitTokens[0]
 
             # print "keyPosToken: " + keyPosToken
 
@@ -210,13 +176,13 @@ def main():##main method
     # print "Correct: " + str(fractionCorrect)
     # print "Incorrect: " + str(fractionIncorrect)
 
-    print str(float(fractionCorrect)*100) + "% CORRECT"
-    print str(float(fractionIncorrect)*100) + "% INCORRECT"
+    print (str(float(fractionCorrect)*100) + "% CORRECT")
+    print (str(float(fractionIncorrect)*100) + "% INCORRECT")
 
     for keyToken in keyTokenDict:
         #for testToken in testTokenDict:
         for testToken in keyTokenDict.get(keyToken):
-            print str(keyToken) + " " + str(testToken) + " " + str(keyTokenDict.get(keyToken).get(testToken))
+            print (str(keyToken) + " " + str(testToken) + " " + str(keyTokenDict.get(keyToken).get(testToken)))
         # print len(keyTokenDict.get(keyToken))
     # print len(keyTokenDict)
 
@@ -245,8 +211,8 @@ def generate_confusion_matrix(keyTokenDict,testPosToken,keyPosToken):
 def generate_tokens(s):
     # print "loading in contents"
     # Convert to lowercases
-    # s = s.lower()
-    s = re.sub("[\[\]]", '', s)
+    s = s.lower()
+    # s = re.sub("[\[\]]", '', s)
 
     # Replace new lines with spaces
     s = re.sub(r'\s+', ' ', s)
