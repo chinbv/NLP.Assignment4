@@ -93,176 +93,220 @@ from decimal import Decimal
 from random import *
 import operator
 
+myBagOfWords={}
+
 
 def main():##main method
 
     # print("This program tags words with POS.")
     # print("Created by Brandon Chin")
 
-    numberOfArgs = len(sys.argv)
-    # print "there are " + str(numberOfArgs) + " arguments"
-    # if numberOfArgs < 3:
-    #     # print "Usage: " + sys.argv[0] + " n m <filenames> where n = number of grams, m = number of sentences"
-    #     exit(1)
+    trainingFilename = sys.argv[1]
 
-    # trainingData = sys.argv[1]
-    # testData = sys.argv[2]
-    numberOfArgs -= 1 # adjust
-    argsIndex = 1
+    myBagOfWords = generate_bagOfWords(trainingFilename)
+
+    # create featureVector for first feature
+    feature1Vector = myBagOfWords.copy()
+
+    feature1Training(feature1Vector, trainingFilename)
+
+    # print("feature1Vector is " + str(feature1Vector))
+
+    # create featureVector for second feature
+    feature2Vector = myBagOfWords.copy()
+
+    feature2Training(feature2Vector, trainingFilename)
+
+    # print("feature2Vector is " + str(feature2Vector))
+
+    # create featureVector for third feature
+    feature3Vector = myBagOfWords.copy()
+
+    feature3Training(feature3Vector, trainingFilename)
+
+    # print("feature3Vector is " + str(feature3Vector))
+
+
+    # create featureVector for fourth feature
+    feature4Vector = myBagOfWords.copy()
+
+    feature4Training(feature4Vector, trainingFilename)
+
+    # print("feature4Vector is " + str(feature4Vector))
+
+
+
+def contextLinesFromFile(filename):
+
+    loadFileName = filename
+    f = open(loadFileName,"r")
+    contents = f.readlines()
+    f.close()
+
+    phoneContextLines=[]
+    phoneToken = None
     aboutToCollectContents = False
-    senseIdTag = None
-    # senseId = None
-    totalCount = 0
-    trainedSenseId = None
 
-    while argsIndex <= numberOfArgs:
-        loadFileName = sys.argv[argsIndex]
-        f = open(loadFileName,"r")
-        contents = f.readlines()
-        f.close()
-        if argsIndex == 1:
-            for line in contents:
-                if aboutToCollectContents == True:
-                    # print ("line is: " + str(line))
-                    if generate_tokens(line) == "phone":
-                        senseIdTag = "phone"
-                    else:
-                        senseIdTag = "product"
-                    print ("senseid=" + str(senseIdTag))
-                    aboutToCollectContents = False
-                    # print ("contextLine: " + str(contextLine))
-                    # if contextLine != "</context>":
-                    # print ("contextLine: " + str(contextLine))
-                    # newSenseId = feature1(contextLine)
-                    # print ("newSenseId: " + str(newSenseId))
-                if "<answer" in line:
-                    answerLine = line
-                    totalCount += 1
+    for line in contents:
+        if "<answer" in line:
+            answerLine = line
+            print ("answerLine: " + answerLine)
 
-                    phonePattern = re.compile(r'\bphone\b')
-                    phoneMatch = phonePattern.match(''.join(answerLine))
-                    # print "cardinalMatch " + str(cardinalMatch)
-                    phoneToken = None
-                    if phoneMatch != None:
-                        phoneToken = phoneMatch.group()
+                # print("line is: " + line)
 
-                    print ("phoneToken: " + str(phoneToken))
+                #phonePattern = re.compile(r'phone')
+            phoneMatch = re.search('phone', answerLine)
+                # print "cardinalMatch " + str(cardinalMatch)
 
-                    print ("answerLine: " + answerLine)
-                if "<context>" in line:
-                    aboutToCollectContents = True
-                # if "</context>" in line:
-                #     aboutToCollectContents = False
-            for l in range(len(frequencyArray)):
-                # print ("length is " + str(len(frequencyArray)))
-                # beautify = frequencyArray.join(frequencyArray[l])
-                # print ("[" + frequencyArray[l] + "]")
+            if phoneMatch is not None:
+                phoneToken = phoneMatch.group()
 
-                # print (frequencyArray[l], end=" ")
-                print(str(frequencyArray[l]) + " ", end='')
+            print ("senseid is a " + str(phoneToken))
 
-                # print ("frequencyArray " + str(frequencyArray[l]) + ",")
+        if "<context>" in line and phoneToken == 'phone':
+            aboutToCollectContents = True
+        else:
+            if aboutToCollectContents == True:
+                # Replace new lines with spaces
+                line = re.sub(r'\s+', ' ', line)
 
-            print ("TotalCount= " + str(totalCount))
-        if argsIndex == 2:
-            print ("\n I got here [2]")
-        argsIndex += 1
+                line = line.lower()
 
+                # print("Line before the stopWords: " + line)
 
-def feature1(contextLine):
-    senseId = None
-    if "phone" in contextLine:
-        senseId = "phone"
-    # else:
-    #     print ("Does not contain phone")
+                # List of stopWords to be removed
+                stopWords=['a','an','and','are','as','at','be','by','for','from','has','he','in',
+                'is','it','its','of','on','that','the','to','was','were','will','with']
 
-    return senseId
+                tagWords=['<s>','</s>','<@>','<p>','</p>']
 
-def feature2(contextLine):
-    senseId = None
-    if "call" in contextLine:
-        senseId = "phone"
-    # else:
-    #     print ("Does not contain call")
+                punctuation=[',','.','!','?','"','--']
 
-    return senseId
+                line = ' '.join([word for word in line.split() if word not in stopWords])
 
-def feature3(contextLine):
-    senseId = None
-    if "telephone" in contextLine:
-        senseId = "phone"
-    # else:
-    #     print ("Does not contain telephone")
+                line = ' '.join([word for word in line.split() if word not in tagWords])
 
-    return senseId
+                line = ' '.join([word for word in line.split() if word not in punctuation])
 
-def feature4(contextLine):
-    senseId = None
-    if "tele" in contextLine:
-        senseId = "phone"
-    # else:
-    #     print ("Does not contain tele")
+                # print("Line after the stopWords: " + line)
 
-    return senseId
+                phoneContextLines.append(line)
+                aboutToCollectContents = False
+                phoneToken = None
 
-def feature5(contextLine):
-    senseId = None
-    if "number" in contextLine:
-        senseId = "phone"
-    # else:
-    #     print ("Does not contain number")
+    return phoneContextLines
 
-    return senseId
+#generating the bag of words
+def generate_bagOfWords(trainingFilename):
 
-arrayOfFunctions = [feature1, feature2, feature3, feature4, feature5]
+    contextLines = contextLinesFromFile(trainingFilename)
 
-freq1 = 0
-freq2 = 0
-freq3 = 0
-freq4 = 0
-freq5 = 0
+    for line in contextLines:
+        # Break sentence into the tokens, remove empty tokens
+        tokens = [token for token in line.split(" ") if token != ""]
 
-frequencyArray = [freq1,freq2,freq3,freq4,freq5]
+        # Adding tokens to myBagOfWords for untrained featureVector
+        for currToken in tokens:
+            if currToken not in myBagOfWords:
+                myBagOfWords[currToken] = 0
 
-#Dealing with the test file tokens
-def generate_tokens(s):
+    # print(myBagOfWords)
+    # print ("size of myBagOfWords = " + str(len(myBagOfWords.keys())))
 
-    resultingSenseId = None
-    # s = re.sub("[\[\]]", '', s)
-
-    # Replace new lines with spaces
-    s = re.sub(r'\s+', ' ', s)
-
-    # Break sentence into the tokens, remove empty tokens
-    tokens = [token for token in s.split(" ") if token != ""]
-
-    # print ("Token is: " + str(tokens) + "\n")
+    return myBagOfWords
 
 
-    count = 0
 
-    for i in range(len(arrayOfFunctions)):
-        f = arrayOfFunctions[i]
-        # print ("f=" + str(f))
 
-        resultingSenseId = f(tokens)
+#Feature gets the word before the <head> tag
+def feature1Training(feature1Vector, trainingFilename):
 
-        if resultingSenseId == "phone":
-            index = i
-            print ("index is: " + str(index))
-            frequencyArray[index] += 1
+    contextLines = contextLinesFromFile(trainingFilename)
 
-            print("frequencyArray " + str(frequencyArray[index]))
+    for contextLine in contextLines:
+        contextLineList = contextLine.split("<head>")
+        if len(contextLineList) == 2:##the target word is at the start of the line, so no before string
 
-        print ("resultingSenseId is: " + str(resultingSenseId))
+            beforeString = contextLineList[0]
+            beforeStringTokens = beforeString.split(" ")
+            lastToken = beforeStringTokens[-2] #because -1 is an ending space
 
-        # print ("resultingSenseId is: " + str(resultingSenseId) + " count " + str(count))
+            # print("beforeString is " + str(beforeString))
+            # print("beforeStringTokens is " + str(beforeStringTokens))
+            # print("lastToken is " + lastToken)
 
-        # count += 1
-        # print ("Count is: " + str(count))
+            feature1Vector[lastToken] = 1
+            print(lastToken +" was added to vector")
 
-    return resultingSenseId
+    return feature1Vector
 
+#Feature gets the word 2 before the <head> tag
+def feature2Training(feature2Vector, trainingFilename):
+
+    contextLines = contextLinesFromFile(trainingFilename)
+
+    for contextLine in contextLines:
+        contextLineList = contextLine.split("<head>")
+        if len(contextLineList) == 2:##the target word is at the start of the line, so no before string
+            beforeString = contextLineList[0]
+            beforeStringTokens = beforeString.split(" ")
+            if len(beforeStringTokens) >= 3:
+                lastToken = beforeStringTokens[-3]
+
+                feature2Vector[lastToken] = 1
+
+                print(lastToken +" was added to vector")
+
+    return feature2Vector
+
+#Feature gets the word after the <head> tag
+def feature3Training(feature3Vector, trainingFilename):
+
+    contextLines = contextLinesFromFile(trainingFilename)
+
+    for contextLine in contextLines:
+        contextLineList = contextLine.split("<head>")
+        if len(contextLineList) == 2:##the target word is at the end of the line, so no after string
+
+            afterString = contextLineList[1]
+            afterStringTokens = afterString.split(" ")
+            firstToken = afterStringTokens[0]
+
+
+            feature3Vector[firstToken] = 1
+
+            # print("contextLineList is " + str(contextLineList))
+            # print("afterString is " + str(afterString))
+            # print("afterStringTokens is " + str(afterStringTokens))
+            # print("firstToken is " + firstToken)
+
+            print(firstToken +" was added to vector")
+
+    return feature3Vector
+
+#Feature gets the word 2 after the <head> tag
+def feature4Training(feature4Vector, trainingFilename):
+
+    contextLines = contextLinesFromFile(trainingFilename)
+
+    for contextLine in contextLines:
+        contextLineList = contextLine.split("<head>")
+        if len(contextLineList) == 2:##the target word is at the end of the line, so no after string
+            afterString = contextLineList[1]
+            afterStringTokens = afterString.split(" ")
+            if len(afterStringTokens) >= 2:
+                firstToken = afterStringTokens[1]
+
+                feature4Vector[firstToken] = 1
+
+                print(firstToken +" was added to vector")
+
+            # print("contextLineList is " + str(contextLineList))
+            # print("afterString is " + str(afterString))
+            # print("afterStringTokens is " + str(afterStringTokens))
+            # print("firstToken is " + firstToken)
+
+    return feature4Vector
 
 
 if __name__ == "__main__":
